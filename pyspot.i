@@ -8,7 +8,6 @@
 %module pyspot // namespace
 %{
 #include "ubend.h"
-#include "streamstats.h"
 #include "bounds.h"
 #include "brent.h"
 #include "gpdfit.h"
@@ -22,7 +21,7 @@
 %include "std_pair.i"
 
 // doxygen
-%include "docs.i"
+//%include "docs.i"
 
 namespace std {
    %template(DoubleVector) vector<double>;
@@ -30,7 +29,6 @@ namespace std {
 }
 
 %include "ubend.h"
-%include "streamstats.h"
 %include "bounds.h"
 %include "brent.h"
 %include "gpdfit.h"

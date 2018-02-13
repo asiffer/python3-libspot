@@ -1,19 +1,16 @@
 Source: python3-libspot
-Section: unknown
+Section: python
 Priority: optional
-Maintainer: asr <asr@unknown>
-Build-Depends: debhelper (>=9),dh-python,python-all (>= 2.6.6-3~),python-setuptools,python3-all,python3-setuptools
+Maintainer: Alban Siffer <alban.siffer@irisa.fr>
+Build-Depends: debhelper (>=9), python3-dev, libspot-dev, swig (>=3.0)
 Standards-Version: 3.9.6
 Homepage: <insert the upstream URL, if relevant>
-X-Python-Version: >= 2.6
-X-Python3-Version: >= 3.2
-#Vcs-Git: git://anonscm.debian.org/collab-maint/python3-libspot.git
-#Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/python3-libspot.git
+
 
 
 Package: python3-libspot
 Architecture: all
-Depends: python3-dev, libspot-dev, swig (>=3.0)
-Suggests: python-python3-libspot-doc
-Description: A python3 wrapper for libspot (Python 3)
- This package installs the library for Python 3.
+Depends: python3-dev, libspot-dev
+Suggests:
+Description: A python3 wrapper for libspot
+ This package installs the python3 bindings
