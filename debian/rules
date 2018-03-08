@@ -3,16 +3,8 @@
 # output every command that modifies files on the build system.
 #export DH_VERBOSE = 1
 
-export PYBUILD_NAME=python3-libspot
-export PYBUILD_INTERPRETERS=python3
-export PYBUILD_SYSTEM=custom
-export PYBUILD_CLEAN_ARGS=make clean
-export PYBUILD_BUILD_ARGS=make
-export PYBUILD_INSTALL_ARGS=make install DESTDIR={dir}/debian/python3-libspot{install_dir}
-
-
 %:
-	dh $@  --with python3 --buildsystem=pybuild
+	dh $@
 
 
 # If you need to rebuild the Sphinx documentation

@@ -1,12 +1,11 @@
 Package: python3-libspot
-Version: 1.0
+Version: 1.1
 Architecture: all
-Maintainer: asr <asr@unknown>
-Installed-Size: 524
-Depends: python3-dev, libspot-dev, swig (>= 3.0)
-Suggests: python-python3-libspot-doc
-Section: unknown
+Maintainer: Alban Siffer <alban.siffer@irisa.fr>
+Installed-Size: 26
+Depends: libspot-dev (>= 1.1)
+Section: python
 Priority: optional
 Homepage: <insert the upstream URL, if relevant>
-Description: A python3 wrapper for libspot (Python 3)
- This package installs the library for Python 3.
+Description: A python3 wrapper for libspot
+ This package installs the python3 bindings
