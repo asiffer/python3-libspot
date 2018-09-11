@@ -310,7 +310,7 @@ class Spot(object):
     def up_probability(self, z):
         """Give the probability to observe things higher than a value
         """
-        return LIBSPOT.Spot_down_probability(self.spot_ptr, z)
+        return LIBSPOT.Spot_up_probability(self.spot_ptr, z)
 
     def down_probability(self, z):
         """Give the probability to observe things lower than a value
