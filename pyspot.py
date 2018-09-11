@@ -22,7 +22,6 @@ from ctypes import c_double, c_int, c_bool, c_void_p, Structure, CDLL
 # loading the library
 LIBSPOT = CDLL('libspot.so')
 
-
 # Some basic C structure needed for the interface
 class SpotConfig(Structure):
     """
