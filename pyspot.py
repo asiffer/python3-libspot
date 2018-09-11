@@ -35,6 +35,7 @@ class SpotConfig(Structure):
                 ('alert', c_bool),
                 ('up', c_bool),
                 ('down', c_bool),
+                ('n_init', c_int),
                 ('level', c_double)]
 
     def __repr__(self):
@@ -65,10 +66,10 @@ class SpotStatus(Structure):
     normal observations, the values of the thresholds etc.
     """
     _fields_ = [('n', c_int),
-                ('Nt_up', c_int),
-                ('Nt_down', c_int),
                 ('ex_up', c_int),
                 ('ex_down', c_int),
+                ('Nt_up', c_int),
+                ('Nt_down', c_int),
                 ('al_up', c_int),
                 ('al_down', c_int),
                 ('t_up', c_double),
@@ -197,7 +198,7 @@ class Spot(object):
         Number of up alarms
     al_down : int
         Number of down alarms
-    	init_batch : vector<double> (C++)
+    init_batch : vector<double> (C++)
         Initial batch (for calibration)
     t_up : float
         Transitional up threshold
