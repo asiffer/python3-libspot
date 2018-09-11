@@ -110,6 +110,10 @@ LIBSPOT.Spot_getUpperThreshold.restype = c_double
 LIBSPOT.Spot_getLowerThreshold.restype = c_double
 LIBSPOT.Spot_getUpper_t.restype = c_double
 LIBSPOT.Spot_getLower_t.restype = c_double
+LIBSPOT.Spot_up_probability.argtypes = [c_void_p, c_double]
+LIBSPOT.Spot_up_probability.restype = c_double
+LIBSPOT.Spot_down_probability.argtypes = [c_void_p, c_double]
+LIBSPOT.Spot_down_probability.restype = c_double
 
 # Spot status export
 LIBSPOT.Spot_status.argtypes = [c_void_p]
@@ -118,6 +122,9 @@ LIBSPOT.Spot_status.restype = SpotStatus
 # Spot config export
 LIBSPOT.Spot_config.argtypes = [c_void_p]
 LIBSPOT.Spot_config.restype = SpotConfig
+
+# Spot setter
+LIBSPOT.Spot_set_q.argtypes = [c_void_p, c_double]
 
 
 # DSPOT
@@ -299,6 +306,16 @@ class Spot(object):
         """Get the lower excess quantile
         """
         return LIBSPOT.Spot_getLower_t(self.spot_ptr)
+
+    def up_probability(self, z):
+        """Give the probability to observe things higher than a value
+        """
+        return LIBSPOT.Spot_down_probability(self.spot_ptr, z)
+
+    def down_probability(self, z):
+        """Give the probability to observe things lower than a value
+        """
+        return LIBSPOT.Spot_down_probability(self.spot_ptr, z)
     
 
 
