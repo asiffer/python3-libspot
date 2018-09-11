@@ -9,7 +9,7 @@ Homepage: <insert the upstream URL, if relevant>
 
 Package: python3-libspot
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}, libspot-dev (>=1.1)
+Depends: ${shlibs:Depends}, ${misc:Depends}, libspot
 Suggests:
 Description: A python3 wrapper for libspot
  This package installs the python3 bindings
