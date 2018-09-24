@@ -23,6 +23,8 @@ from ctypes import c_double, c_int, c_bool, c_void_p, Structure, CDLL
 LIBSPOT = CDLL('libspot.so')
 
 # Some basic C structure needed for the interface
+
+
 class SpotConfig(Structure):
     """
     SpotConfig (C structure, inherit ctypes.Structure)
@@ -37,12 +39,23 @@ class SpotConfig(Structure):
                 ('down', c_bool),
                 ('n_init', c_int),
                 ('level', c_double)]
+    _fmt_ = """
+            ---- SpotConfig ----
+            --------------------
+                     q  {:8.2e}
+               bounded  {:8}
+            max_excess  {:8d}
+                 alert  {:8}
+                    up  {:8}
+                  down  {:8}
+                n_init  {:8d}
+                 level  {:8.3f}"""
 
     def __repr__(self):
         out = ''
         header = '{0} {1} {0}\n'.format("----", "SpotConfig")
-        width = len(header)-1
-        width_2 = width//2
+        width = len(header) - 1
+        width_2 = width // 2
         pattern = '{:-^' + str(width) + '}\n'
         out += header
         out += pattern.format("")
@@ -56,6 +69,26 @@ class SpotConfig(Structure):
                 pattern = base_pattern + "  {}\n"
             out += pattern.format(name, self.__getattribute__(name))
         return out
+
+    def to_dict(self):
+        return {'q': self.q,
+                'bounded': self.bounded,
+                'max_excess': self.max_excess,
+                'alert': self.alert,
+                'up': self.up,
+                'down': self.down,
+                'n_init': self.n_init,
+                'level': self.level}
+
+    def __iter__(self):
+        yield 'q', self.q
+        yield 'bounded', self.bounded
+        yield 'max_excess', self.max_excess
+        yield 'alert', self.alert
+        yield 'up', self.up
+        yield 'down', self.down
+        yield 'n_init', self.n_init
+        yield 'level', self.level
 
 
 class SpotStatus(Structure):
@@ -80,8 +113,8 @@ class SpotStatus(Structure):
     def __repr__(self):
         out = ''
         header = '{0} {1} {0}\n'.format("----", "SpotStatus")
-        width = len(header)-1
-        width_2 = width//2
+        width = len(header) - 1
+        width_2 = width // 2
         pattern = '{:-^' + str(width) + '}\n'
         out += header
         out += pattern.format("")
@@ -95,6 +128,33 @@ class SpotStatus(Structure):
                 pattern = base_pattern + "  {}\n"
             out += pattern.format(name, self.__getattribute__(name))
         return out
+
+    def to_dict(self):
+        return {'n': self.n,
+                'ex_up': self.ex_up,
+                'ex_down': self.ex_down,
+                'Nt_up': self.Nt_up,
+                'Nt_down': self.Nt_down,
+                'al_up': self.al_up,
+                'al_down': self.al_down,
+                't_up': self.t_up,
+                't_down': self.t_down,
+                'z_up': self.z_up,
+                'z_down': self.z_down}
+
+    def __iter__(self):
+        yield 'n', self.n,
+        yield 'ex_up', self.ex_up
+        yield 'ex_down', self.ex_down
+        yield 'Nt_up', self.Nt_up
+        yield 'Nt_down', self.Nt_down
+        yield 'al_up', self.al_up
+        yield 'al_down', self.al_down
+        yield 't_up', self.t_up
+        yield 't_down', self.t_down
+        yield 'z_up', self.z_up
+        yield 'z_down', self.z_down
+
 
 # Define the input/output of the C functions (interface.cpp)
 # Spot object creation
@@ -130,7 +190,7 @@ LIBSPOT.Spot_set_q.argtypes = [c_void_p, c_double]
 
 # DSPOT
 LIBSPOT.DSpot_new.argtypes = [c_int, c_double, c_int, c_double, c_bool, c_bool,
-                             c_bool, c_bool, c_int]
+                              c_bool, c_bool, c_int]
 LIBSPOT.DSpot_new.restype = c_void_p
 
 # DSpot step method
@@ -147,8 +207,6 @@ LIBSPOT.DSpot_getDrift.restype = c_double
 # DSpot status export
 LIBSPOT.DSpot_status.argtypes = [c_void_p]
 LIBSPOT.DSpot_status.restype = SpotStatus
-
-
 
 
 # Spot object creation
@@ -214,7 +272,8 @@ class Spot(object):
         Object to compute the lower threshold
 
     """
-    def __init__(self, q=1e-4, n_init=2000, level=0.99, up=True, down=True,\
+
+    def __init__(self, q=1e-4, n_init=2000, level=0.99, up=True, down=True,
                  alert=True, bounded=True, max_excess=200):
         """
         Full parametrizable constructor
@@ -248,7 +307,8 @@ class Spot(object):
         >>> S = Spot(q = 1e-4, n_init = 1000, level = 0.98)
 
         """
-        self.spot_ptr = LIBSPOT.Spot_new(q, n_init, level, up, down, alert, bounded, max_excess)
+        self.spot_ptr = LIBSPOT.Spot_new(
+            q, n_init, level, up, down, alert, bounded, max_excess)
 
     def step(self, data):
         """Spot iteration
@@ -317,7 +377,6 @@ class Spot(object):
         """Give the probability to observe things lower than a value
         """
         return LIBSPOT.Spot_down_probability(self.spot_ptr, z)
-    
 
 
 # Spot object creation
@@ -368,7 +427,7 @@ class DSpot(object):
         Number of up alarms
     al_down : int
         Number of down alarms
-    	init_batch : vector<double> (C++)
+        init_batch : vector<double> (C++)
         Initial batch (for calibration)
     t_up : float
         Transitional up threshold
@@ -384,8 +443,18 @@ class DSpot(object):
         Object to compute the lower threshold
 
     """
-    def __init__(self, d=10, q=1e-4, n_init=2000, level=0.99, up=True, down=True,
-                 alert=True, bounded=True, max_excess=200):
+
+    def __init__(
+            self,
+            d=10,
+            q=1e-4,
+            n_init=2000,
+            level=0.99,
+            up=True,
+            down=True,
+            alert=True,
+            bounded=True,
+            max_excess=200):
         """
         Full parametrizable constructor
 
@@ -420,8 +489,8 @@ class DSpot(object):
         >>> S = DSpot(d = 50, q = 1e-4, n_init = 1000, level = 0.98)
 
         """
-        self.dspot_ptr = LIBSPOT.DSpot_new(d, q, n_init, level, up, down, alert,
-                                         bounded, max_excess)
+        self.dspot_ptr = LIBSPOT.DSpot_new(
+            d, q, n_init, level, up, down, alert, bounded, max_excess)
 
     def step(self, data):
         """Spot iteration
