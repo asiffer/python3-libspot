@@ -20,7 +20,11 @@ along with this program.  If not, see http://www.gnu.org/licenses/.
 from ctypes import c_double, c_int, c_bool, c_void_p, Structure, CDLL
 
 # loading the library
-LIBSPOT = CDLL('libspot.so')
+try:
+    LIBSPOT = CDLL('libspot.so')
+except OSError as e:
+    print(e)
+    print("The library libspot seems missing... To get it see https://asiffer.github.io/libspot/download/")
 
 # Some basic C structure needed for the interface
 
@@ -189,8 +193,7 @@ LIBSPOT.Spot_set_q.argtypes = [c_void_p, c_double]
 
 
 # DSPOT
-LIBSPOT.DSpot_new.argtypes = [c_int, c_double, c_int, c_double, c_bool, c_bool,
-                              c_bool, c_bool, c_int]
+LIBSPOT.DSpot_new.argtypes = [c_int, c_double, c_int, c_double, c_bool, c_bool, c_bool, c_bool, c_int]
 LIBSPOT.DSpot_new.restype = c_void_p
 
 # DSpot step method
@@ -227,7 +230,7 @@ class Spot(object):
 
     q : float
         The main parameter ( P(X>z_q) < q ) : probability of abnormal events
-        (between 0 and 1, but close to 1)
+        (between 0 and 1, but close to 0)
     n_init : int
         Number of initial observations to perform calibration
     level : float
