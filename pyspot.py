@@ -166,6 +166,9 @@ LIBSPOT.Spot_new.argtypes = [c_double, c_int, c_double, c_bool, c_bool,
                              c_bool, c_bool, c_int]
 LIBSPOT.Spot_new.restype = c_void_p
 
+# Spot destructor
+LIBSPOT.Spot_delete.argtypes = [c_void_p]
+
 # Spot step method
 LIBSPOT.Spot_step.argtypes = [c_void_p, c_double]
 LIBSPOT.Spot_step.restype = c_int
@@ -192,9 +195,23 @@ LIBSPOT.Spot_config.restype = SpotConfig
 LIBSPOT.Spot_set_q.argtypes = [c_void_p, c_double]
 
 
-# DSPOT
-LIBSPOT.DSpot_new.argtypes = [c_int, c_double, c_int, c_double, c_bool, c_bool, c_bool, c_bool, c_int]
-LIBSPOT.DSpot_new.restype = c_void_p
+# DSPOT (deprecated)
+# LIBSPOT.DSpot_new.argtypes = [c_int, c_double, c_int, c_double, c_bool, c_bool, c_bool, c_bool, c_int]
+# LIBSPOT.DSpot_new.restype = c_void_p
+LIBSPOT.DSpot_new_light.argtypes = [
+    c_int,
+    c_int,
+    c_double,
+    c_bool,
+    c_bool,
+    c_bool,
+    c_bool,
+    c_int]
+LIBSPOT.DSpot_new_light.restype = c_void_p
+LIBSPOT.DSpot_set_q.argtypes = [c_void_p, c_double]
+
+# DSpot destructor
+LIBSPOT.DSpot_delete.argtypes = [c_void_p]
 
 # DSpot step method
 LIBSPOT.DSpot_step.argtypes = [c_void_p, c_double]
@@ -381,6 +398,10 @@ class Spot(object):
         """
         return LIBSPOT.Spot_down_probability(self.spot_ptr, z)
 
+    def __del__(self):
+        """Call C destructor"""
+        LIBSPOT.Spot_delete(self.spot_ptr)
+
 
 # Spot object creation
 class DSpot(object):
@@ -492,8 +513,11 @@ class DSpot(object):
         >>> S = DSpot(d = 50, q = 1e-4, n_init = 1000, level = 0.98)
 
         """
-        self.dspot_ptr = LIBSPOT.DSpot_new(
-            d, q, n_init, level, up, down, alert, bounded, max_excess)
+        # self.dspot_ptr = LIBSPOT.DSpot_new(
+        #     d, q, n_init, level, up, down, alert, bounded, max_excess)
+        self.dspot_ptr = LIBSPOT.DSpot_new_light(
+            d, n_init, level, up, down, alert, bounded, max_excess)
+        LIBSPOT.DSpot_set_q(self.dspot_ptr, q)
 
     def step(self, data):
         """Spot iteration
@@ -528,10 +552,10 @@ class DSpot(object):
         """
         return LIBSPOT.DSpot_status(self.dspot_ptr)
 
-#    def config(self):
-#        """Initial config of the algorithm
-#        """
-#        return LIBSPOT.DSpot_config(self.dspot_ptr)
+    def config(self):
+        """Initial config of the algorithm
+        """
+        return LIBSPOT.Spot_config(self.dspot_ptr)
 
     def get_upper_threshold(self):
         """Get the current upper threshold
@@ -557,3 +581,7 @@ class DSpot(object):
         """Get the current drift
         """
         return LIBSPOT.DSpot_getDrift(self.dspot_ptr)
+
+    def __del__(self):
+        """Call C destructor"""
+        LIBSPOT.DSpot_delete(self.dspot_ptr)
