@@ -19,9 +19,12 @@ along with this program.  If not, see http://www.gnu.org/licenses/.
 
 from ctypes import c_double, c_int, c_bool, c_void_p, Structure, CDLL
 
+# unfortunately version must be hardcoded 
+__version__ = '1.1.2'
+
 # loading the library
 try:
-    LIBSPOT = CDLL('libspot.so')
+    LIBSPOT = CDLL('/usr/lib/libspot.so')
 except OSError as e:
     print(e)
     print("The library libspot seems missing... To get it see https://asiffer.github.io/libspot/download/")
