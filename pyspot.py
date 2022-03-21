@@ -226,10 +226,19 @@ LIBSPOT.DSpot_step.argtypes = [c_void_p, c_double]
 LIBSPOT.DSpot_step.restype = c_int
 
 # DSpot getters
+LIBSPOT.DSpot_getUpperThreshold.argtypes = [c_void_p]
 LIBSPOT.DSpot_getUpperThreshold.restype = c_double
+
+LIBSPOT.DSpot_getLowerThreshold.argtypes = [c_void_p]
 LIBSPOT.DSpot_getLowerThreshold.restype = c_double
+
+LIBSPOT.DSpot_getUpper_t.argtypes = [c_void_p]
 LIBSPOT.DSpot_getUpper_t.restype = c_double
+
+LIBSPOT.DSpot_getLower_t.argtypes = [c_void_p]
 LIBSPOT.DSpot_getLower_t.restype = c_double
+
+LIBSPOT.DSpot_getDrift.argtypes = [c_void_p]
 LIBSPOT.DSpot_getDrift.restype = c_double
 
 # DSpot status export
