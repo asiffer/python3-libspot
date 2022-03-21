@@ -174,10 +174,18 @@ LIBSPOT.Spot_step.argtypes = [c_void_p, c_double]
 LIBSPOT.Spot_step.restype = c_int
 
 # Spot getters
+LIBSPOT.Spot_getUpperThreshold.argtypes = [c_void_p]
 LIBSPOT.Spot_getUpperThreshold.restype = c_double
+
+LIBSPOT.Spot_getLowerThreshold.argtypes = [c_void_p]
 LIBSPOT.Spot_getLowerThreshold.restype = c_double
+
+LIBSPOT.Spot_getUpper_t.argtypes = [c_void_p]
 LIBSPOT.Spot_getUpper_t.restype = c_double
+
+LIBSPOT.Spot_getLower_t.argtypes = [c_void_p]
 LIBSPOT.Spot_getLower_t.restype = c_double
+
 LIBSPOT.Spot_up_probability.argtypes = [c_void_p, c_double]
 LIBSPOT.Spot_up_probability.restype = c_double
 LIBSPOT.Spot_down_probability.argtypes = [c_void_p, c_double]
