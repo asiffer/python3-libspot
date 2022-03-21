@@ -2,14 +2,13 @@ Source: python3-libspot
 Section: python
 Priority: optional
 Maintainer: Alban Siffer <alban.siffer@irisa.fr>
-Build-Depends: debhelper (>=9)
+Build-Depends: debhelper (>=10)
 Standards-Version: 3.9.6
-Homepage: <insert the upstream URL, if relevant>
+Homepage: https://asiffer.github.io/libspot/
 
 
 Package: python3-libspot
 Architecture: all
 Depends: ${shlibs:Depends}, ${misc:Depends}, libspot
-Suggests:
 Description: A python3 wrapper for libspot
  This package installs the python3 bindings

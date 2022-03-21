@@ -6,7 +6,6 @@
 %:
 	dh $@
 
-
 # If you need to rebuild the Sphinx documentation
 # Add spinxdoc to the dh --with line
 #override_dh_auto_build:

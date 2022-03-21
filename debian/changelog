@@ -1,5 +1,4 @@
-python3-libspot (1.1) unstable; urgency=medium
-
+python3-libspot (1.1.2) stable; urgency=medium
   * Initial Release.
 
  -- Alban Siffer <alban.siffer@irisa.fr>  Thu, 02 Nov 2017 16:00:27 +0100
