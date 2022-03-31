@@ -13,6 +13,9 @@ build:
 package:
 	$(poetry) build
 
+publish:
+	$(poetry) publish
+
 debian-image:
 	$(container) build -t $(IMAGE_NAME) .
 
@@ -21,3 +24,7 @@ debian-container: debian-image
 
 debian:
 	$(dpkg) -us -uc -d
+
+test:
+	pytest -xvs tests
+

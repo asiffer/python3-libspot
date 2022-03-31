@@ -17,17 +17,39 @@ along with this program.  If not, see http://www.gnu.org/licenses/.
 @author: asr
 """
 
-from ctypes import c_double, c_int, c_bool, c_void_p, Structure, CDLL
 
-# unfortunately version must be hardcoded 
-__version__ = '1.1.2'
+import os
+import sys
+from ctypes import CDLL, Structure, c_bool, c_double, c_int, c_void_p
+
+if sys.version_info >= (3, 8):
+    from importlib import metadata
+else:
+    import importlib_metadata as metadata
+
+__version__ = metadata.version(__name__)
+
+
+def find_libspot() -> CDLL:
+    # try directly
+    try:
+        return CDLL("libspot.so")
+    except OSError as err:
+        abspath = "/usr/lib/libspot.so"
+        if os.path.exists(abspath):
+            return CDLL(abspath)
+        raise OSError(
+            "{}\nThe library libspot seems missing... "
+            "To get it see https://asiffer.github.io/libspot/download/".format(err)
+        )
+
 
 # loading the library
 try:
-    LIBSPOT = CDLL('/usr/lib/libspot.so')
-except OSError as e:
-    print(e)
-    print("The library libspot seems missing... To get it see https://asiffer.github.io/libspot/download/")
+    LIBSPOT = find_libspot()
+except OSError as err:
+    print(err)
+
 
 # Some basic C structure needed for the interface
 
@@ -38,14 +60,17 @@ class SpotConfig(Structure):
     This structure gathers the configuration of a Spot object (aims to build
     similar instance)
     """
-    _fields_ = [('q', c_double),
-                ('bounded', c_bool),
-                ('max_excess', c_int),
-                ('alert', c_bool),
-                ('up', c_bool),
-                ('down', c_bool),
-                ('n_init', c_int),
-                ('level', c_double)]
+
+    _fields_ = [
+        ("q", c_double),
+        ("bounded", c_bool),
+        ("max_excess", c_int),
+        ("alert", c_bool),
+        ("up", c_bool),
+        ("down", c_bool),
+        ("n_init", c_int),
+        ("level", c_double),
+    ]
     _fmt_ = """
             ---- SpotConfig ----
             --------------------
@@ -59,14 +84,14 @@ class SpotConfig(Structure):
                  level  {:8.3f}"""
 
     def __repr__(self):
-        out = ''
-        header = '{0} {1} {0}\n'.format("----", "SpotConfig")
+        out = ""
+        header = "{0} {1} {0}\n".format("----", "SpotConfig")
         width = len(header) - 1
         width_2 = width // 2
-        pattern = '{:-^' + str(width) + '}\n'
+        pattern = "{:-^" + str(width) + "}\n"
         out += header
         out += pattern.format("")
-        base_pattern = '{:>' + str(width_2) + '}'
+        base_pattern = "{:>" + str(width_2) + "}"
         for name, ctype in self._fields_:
             if ctype is c_double:
                 pattern = base_pattern + "  {:.4f}\n"
@@ -78,24 +103,26 @@ class SpotConfig(Structure):
         return out
 
     def to_dict(self):
-        return {'q': self.q,
-                'bounded': self.bounded,
-                'max_excess': self.max_excess,
-                'alert': self.alert,
-                'up': self.up,
-                'down': self.down,
-                'n_init': self.n_init,
-                'level': self.level}
+        return {
+            "q": self.q,
+            "bounded": self.bounded,
+            "max_excess": self.max_excess,
+            "alert": self.alert,
+            "up": self.up,
+            "down": self.down,
+            "n_init": self.n_init,
+            "level": self.level,
+        }
 
     def __iter__(self):
-        yield 'q', self.q
-        yield 'bounded', self.bounded
-        yield 'max_excess', self.max_excess
-        yield 'alert', self.alert
-        yield 'up', self.up
-        yield 'down', self.down
-        yield 'n_init', self.n_init
-        yield 'level', self.level
+        yield "q", self.q
+        yield "bounded", self.bounded
+        yield "max_excess", self.max_excess
+        yield "alert", self.alert
+        yield "up", self.up
+        yield "down", self.down
+        yield "n_init", self.n_init
+        yield "level", self.level
 
 
 class SpotStatus(Structure):
@@ -105,27 +132,30 @@ class SpotStatus(Structure):
     area. It gives the number of excesses, the number of alarms, the number of
     normal observations, the values of the thresholds etc.
     """
-    _fields_ = [('n', c_int),
-                ('ex_up', c_int),
-                ('ex_down', c_int),
-                ('Nt_up', c_int),
-                ('Nt_down', c_int),
-                ('al_up', c_int),
-                ('al_down', c_int),
-                ('t_up', c_double),
-                ('t_down', c_double),
-                ('z_up', c_double),
-                ('z_down', c_double)]
+
+    _fields_ = [
+        ("n", c_int),
+        ("ex_up", c_int),
+        ("ex_down", c_int),
+        ("Nt_up", c_int),
+        ("Nt_down", c_int),
+        ("al_up", c_int),
+        ("al_down", c_int),
+        ("t_up", c_double),
+        ("t_down", c_double),
+        ("z_up", c_double),
+        ("z_down", c_double),
+    ]
 
     def __repr__(self):
-        out = ''
-        header = '{0} {1} {0}\n'.format("----", "SpotStatus")
+        out = ""
+        header = "{0} {1} {0}\n".format("----", "SpotStatus")
         width = len(header) - 1
         width_2 = width // 2
-        pattern = '{:-^' + str(width) + '}\n'
+        pattern = "{:-^" + str(width) + "}\n"
         out += header
         out += pattern.format("")
-        base_pattern = '{:>' + str(width_2) + '}'
+        base_pattern = "{:>" + str(width_2) + "}"
         for name, ctype in self._fields_:
             if ctype is c_double:
                 pattern = base_pattern + "  {:.4f}\n"
@@ -137,39 +167,49 @@ class SpotStatus(Structure):
         return out
 
     def to_dict(self):
-        return {'n': self.n,
-                'ex_up': self.ex_up,
-                'ex_down': self.ex_down,
-                'Nt_up': self.Nt_up,
-                'Nt_down': self.Nt_down,
-                'al_up': self.al_up,
-                'al_down': self.al_down,
-                't_up': self.t_up,
-                't_down': self.t_down,
-                'z_up': self.z_up,
-                'z_down': self.z_down}
+        return {
+            "n": self.n,
+            "ex_up": self.ex_up,
+            "ex_down": self.ex_down,
+            "Nt_up": self.Nt_up,
+            "Nt_down": self.Nt_down,
+            "al_up": self.al_up,
+            "al_down": self.al_down,
+            "t_up": self.t_up,
+            "t_down": self.t_down,
+            "z_up": self.z_up,
+            "z_down": self.z_down,
+        }
 
     def __iter__(self):
-        yield 'n', self.n,
-        yield 'ex_up', self.ex_up
-        yield 'ex_down', self.ex_down
-        yield 'Nt_up', self.Nt_up
-        yield 'Nt_down', self.Nt_down
-        yield 'al_up', self.al_up
-        yield 'al_down', self.al_down
-        yield 't_up', self.t_up
-        yield 't_down', self.t_down
-        yield 'z_up', self.z_up
-        yield 'z_down', self.z_down
+        yield "n", self.n,
+        yield "ex_up", self.ex_up
+        yield "ex_down", self.ex_down
+        yield "Nt_up", self.Nt_up
+        yield "Nt_down", self.Nt_down
+        yield "al_up", self.al_up
+        yield "al_down", self.al_down
+        yield "t_up", self.t_up
+        yield "t_down", self.t_down
+        yield "z_up", self.z_up
+        yield "z_down", self.z_down
 
 
 # Define the input/output of the C functions (interface.cpp)
 # Spot object creation
-LIBSPOT.Spot_new.argtypes = [c_double, c_int, c_double, c_bool, c_bool,
-                             c_bool, c_bool, c_int]
+LIBSPOT.Spot_new.argtypes = [
+    c_double,
+    c_int,
+    c_double,
+    c_bool,
+    c_bool,
+    c_bool,
+    c_bool,
+    c_int,
+]
 LIBSPOT.Spot_new.restype = c_void_p
 
-# Spot destructor
+# Spot destructor
 LIBSPOT.Spot_delete.argtypes = [c_void_p]
 
 # Spot step method
@@ -217,11 +257,12 @@ LIBSPOT.DSpot_new_light.argtypes = [
     c_bool,
     c_bool,
     c_bool,
-    c_int]
+    c_int,
+]
 LIBSPOT.DSpot_new_light.restype = c_void_p
 LIBSPOT.DSpot_set_q.argtypes = [c_void_p, c_double]
 
-# DSpot destructor
+# DSpot destructor
 LIBSPOT.DSpot_delete.argtypes = [c_void_p]
 
 # DSpot step method
@@ -313,8 +354,17 @@ class Spot(object):
 
     """
 
-    def __init__(self, q=1e-4, n_init=2000, level=0.99, up=True, down=True,
-                 alert=True, bounded=True, max_excess=200):
+    def __init__(
+        self,
+        q=1e-4,
+        n_init=2000,
+        level=0.99,
+        up=True,
+        down=True,
+        alert=True,
+        bounded=True,
+        max_excess=200,
+    ):
         """
         Full parametrizable constructor
 
@@ -348,7 +398,8 @@ class Spot(object):
 
         """
         self.spot_ptr = LIBSPOT.Spot_new(
-            q, n_init, level, up, down, alert, bounded, max_excess)
+            q, n_init, level, up, down, alert, bounded, max_excess
+        )
 
     def step(self, data):
         """Spot iteration
@@ -379,43 +430,35 @@ class Spot(object):
         return LIBSPOT.Spot_step(self.spot_ptr, data)
 
     def status(self):
-        """Get the internal state of the Spot instance
-        """
+        """Get the internal state of the Spot instance"""
         return LIBSPOT.Spot_status(self.spot_ptr)
 
     def config(self):
-        """Initial config of the algorithm
-        """
+        """Initial config of the algorithm"""
         return LIBSPOT.Spot_config(self.spot_ptr)
 
     def get_upper_threshold(self):
-        """Get the current upper threshold
-        """
+        """Get the current upper threshold"""
         return LIBSPOT.Spot_getUpperThreshold(self.spot_ptr)
 
     def get_lower_threshold(self):
-        """Get the current lower threshold
-        """
+        """Get the current lower threshold"""
         return LIBSPOT.Spot_getLowerThreshold(self.spot_ptr)
 
     def get_upper_t(self):
-        """Get the upper excess quantile
-        """
+        """Get the upper excess quantile"""
         return LIBSPOT.Spot_getUpper_t(self.spot_ptr)
 
     def get_lower_t(self):
-        """Get the lower excess quantile
-        """
+        """Get the lower excess quantile"""
         return LIBSPOT.Spot_getLower_t(self.spot_ptr)
 
     def up_probability(self, z):
-        """Give the probability to observe things higher than a value
-        """
+        """Give the probability to observe things higher than a value"""
         return LIBSPOT.Spot_up_probability(self.spot_ptr, z)
 
     def down_probability(self, z):
-        """Give the probability to observe things lower than a value
-        """
+        """Give the probability to observe things lower than a value"""
         return LIBSPOT.Spot_down_probability(self.spot_ptr, z)
 
     def __del__(self):
@@ -489,16 +532,17 @@ class DSpot(object):
     """
 
     def __init__(
-            self,
-            d=10,
-            q=1e-4,
-            n_init=2000,
-            level=0.99,
-            up=True,
-            down=True,
-            alert=True,
-            bounded=True,
-            max_excess=200):
+        self,
+        d=10,
+        q=1e-4,
+        n_init=2000,
+        level=0.99,
+        up=True,
+        down=True,
+        alert=True,
+        bounded=True,
+        max_excess=200,
+    ):
         """
         Full parametrizable constructor
 
@@ -536,7 +580,8 @@ class DSpot(object):
         # self.dspot_ptr = LIBSPOT.DSpot_new(
         #     d, q, n_init, level, up, down, alert, bounded, max_excess)
         self.dspot_ptr = LIBSPOT.DSpot_new_light(
-            d, n_init, level, up, down, alert, bounded, max_excess)
+            d, n_init, level, up, down, alert, bounded, max_excess
+        )
         LIBSPOT.DSpot_set_q(self.dspot_ptr, q)
 
     def step(self, data):
@@ -568,38 +613,31 @@ class DSpot(object):
         return LIBSPOT.DSpot_step(self.dspot_ptr, data)
 
     def status(self):
-        """Get the internal state of the Spot instance
-        """
+        """Get the internal state of the Spot instance"""
         return LIBSPOT.DSpot_status(self.dspot_ptr)
 
     def config(self):
-        """Initial config of the algorithm
-        """
+        """Initial config of the algorithm"""
         return LIBSPOT.Spot_config(self.dspot_ptr)
 
     def get_upper_threshold(self):
-        """Get the current upper threshold
-        """
+        """Get the current upper threshold"""
         return LIBSPOT.DSpot_getUpperThreshold(self.dspot_ptr)
 
     def get_lower_threshold(self):
-        """Get the current lower threshold
-        """
+        """Get the current lower threshold"""
         return LIBSPOT.DSpot_getLowerThreshold(self.dspot_ptr)
 
     def get_upper_t(self):
-        """Get the upper excess quantile
-        """
+        """Get the upper excess quantile"""
         return LIBSPOT.DSpot_getUpper_t(self.dspot_ptr)
 
     def get_lower_t(self):
-        """Get the lower excess quantile
-        """
+        """Get the lower excess quantile"""
         return LIBSPOT.DSpot_getLower_t(self.dspot_ptr)
 
     def get_drift(self):
-        """Get the current drift
-        """
+        """Get the current drift"""
         return LIBSPOT.DSpot_getDrift(self.dspot_ptr)
 
     def __del__(self):
