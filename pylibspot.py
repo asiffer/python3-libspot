@@ -20,28 +20,68 @@ along with this program.  If not, see http://www.gnu.org/licenses/.
 
 import os
 import sys
-from ctypes import CDLL, Structure, c_bool, c_double, c_int, c_void_p
+from ctypes import (
+    CDLL,
+    Structure,
+    c_bool,
+    c_char_p,
+    c_double,
+    c_int,
+    c_size_t,
+    c_void_p,
+    create_string_buffer,
+)
 
 if sys.version_info >= (3, 8):
     from importlib import metadata
 else:
     import importlib_metadata as metadata
 
-__version__ = metadata.version(__name__)
+try:
+    __version__ = metadata.version(__name__)
+except BaseException:
+    __version__ = "dev"
 
 
 def find_libspot() -> CDLL:
-    # try directly
+    # find through environment
+    try:
+        abspath = os.environ.get("LIBSPOT", None)
+        if os.path.exists(abspath):
+            return CDLL(abspath)
+    except TypeError or OSError:
+        pass
+
+    # try through system
     try:
         return CDLL("libspot.so")
-    except OSError as err:
+    except OSError:
+        pass
+
+    # try with default path
+    try:
         abspath = "/usr/lib/libspot.so"
         if os.path.exists(abspath):
             return CDLL(abspath)
-        raise OSError(
-            "{}\nThe library libspot seems missing... "
-            "To get it see https://asiffer.github.io/libspot/download/".format(err)
-        )
+    except OSError:
+        pass
+
+    # try current directory
+    try:
+        abspath = os.path.abspath(os.path.join(os.getcwd(), "libspot.so"))
+        if os.path.exists(abspath):
+            return CDLL(abspath)
+    except OSError:
+        pass
+
+    raise OSError(
+        "The library libspot seems missing... "
+        "To get it see https://asiffer.github.io/libspot/download/."
+        "If the library is installed, you should ensure that "
+        "libspot.so is present in classical path (like /usr/lib/libspot.so)."
+        "In all cases, you can define the LIBSPOT env variable "
+        "to set the right path."
+    )
 
 
 # loading the library
@@ -288,6 +328,17 @@ LIBSPOT.DSpot_getDrift.restype = c_double
 # DSpot status export
 LIBSPOT.DSpot_status.argtypes = [c_void_p]
 LIBSPOT.DSpot_status.restype = SpotStatus
+
+# version (since libspot v1.3.0)
+LIBSPOT.version.argtypes = [c_char_p, c_size_t]
+LIBSPOT.version.restype = None
+
+
+def libspot_version() -> str:
+    n = 16
+    buffer = create_string_buffer(n)
+    LIBSPOT.version(buffer, n)
+    return buffer.raw.decode()
 
 
 # Spot object creation
