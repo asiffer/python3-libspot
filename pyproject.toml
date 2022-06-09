@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "pylibspot"
+version = "1.1.3"
+description = "PyPI version of the python3 bindings to libspot"
+authors = ["Alban Siffer <alban.siffer@irisa.fr>"]
+maintainers = ["Alban Siffer <alban.siffer@irisa.fr>"]
+homepage = "https://asiffer.github.io/libspot/"
+repository = "https://github.com/asiffer/python3-libspot"
+license = "GPL-3.0-only"
+packages = [
+    { include = "pylibspot.py" },
+]
+
+[tool.poetry.dependencies]
+python = "^3"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

@@ -1,4 +1,4 @@
-import pyspot as ps # name of the python3 package
+import pylibspot as ps # new name of the python3 package
 import pandas as pd
 import matplotlib.pyplot as plt
 
